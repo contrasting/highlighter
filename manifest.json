@@ -14,8 +14,8 @@
         "index.js"
       ],
       "matches": [
-        "http://*/",
-        "https://*/"
+        "http://*/*",
+        "https://*/*"
       ]
     }
   ],
