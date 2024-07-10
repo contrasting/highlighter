@@ -1,10 +1,10 @@
 // https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
 chrome.storage.local.onChanged.addListener((changes) => {
     const highlights = changes[window.location.href].newValue;
-    applyHighlights(highlights);
+    applyHighlights(highlights, true);
 });
 
-function applyHighlights(highlights) {
+function applyHighlights(highlights, onlyFirst = false) {
     if (highlights === undefined) return;
 
     // store the current scroll position
@@ -22,6 +22,8 @@ function applyHighlights(highlights) {
 
         rng.deleteContents();
         rng.insertNode(mark);
+
+        if (onlyFirst) break;
     }
 
     // restore
