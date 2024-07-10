@@ -1,11 +1,21 @@
 // https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
 chrome.storage.local.onChanged.addListener((changes) => {
     const highlights = changes[window.location.href].newValue;
-    applyHighlights(highlights, true);
+    applyHighlights(highlights);
 });
 
-function applyHighlights(highlights, onlyFirst = false) {
+
+const resets = [];
+
+function resetHighlights() {
+    resets.forEach(r => r());
+    resets.length = 0;
+}
+
+function applyHighlights(highlights) {
     if (highlights === undefined) return;
+
+    resetHighlights();
 
     // store the current scroll position
     const pos = document.documentElement.scrollTop;
@@ -15,11 +25,10 @@ function applyHighlights(highlights, onlyFirst = false) {
     for (let h of highlights) {
         // wraparound otherwise will skip instances
         if (window.find(h, true, false, true)) {
-            highlightCurrSelection();
+            resets.push(highlightCurrSelection());
         } else {
             recursiveHighlight(h);
         }
-        if (onlyFirst) break;
     }
 
     // restore
@@ -34,9 +43,15 @@ function highlightCurrSelection() {
 
     const mark = document.createElement("mark");
     mark.appendChild(rng.cloneContents());
+    const reset = () => {
+        rng.deleteContents();
+        rng.insertNode(document.createTextNode(mark.innerText));
+    }
+    mark.ondblclick = reset;
 
     rng.deleteContents();
     rng.insertNode(mark);
+    return reset;
 }
 
 function recursiveHighlight(str) {
@@ -45,7 +60,7 @@ function recursiveHighlight(str) {
     for (let i = words.length; i >= 0; i--) {
         const reducedStr = words.filter((value, index) => index < i).join(" ");
         if (window.find(reducedStr, true, false, true)) {
-            highlightCurrSelection();
+            resets.push(highlightCurrSelection());
             // the rest of the string
             recursiveHighlight(words.filter((value, index) => index >= i).join(" "));
             break;
