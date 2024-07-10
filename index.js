@@ -7,6 +7,9 @@ chrome.storage.local.onChanged.addListener((changes) => {
 function applyHighlights(highlights) {
     if (highlights === undefined) return;
 
+    // store the current scroll position
+    const pos = document.documentElement.scrollTop;
+
     // https://stackoverflow.com/questions/8276113/what-is-the-best-approach-to-search-some-text-in-body-html
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     for (let h of highlights) {
@@ -21,11 +24,15 @@ function applyHighlights(highlights) {
         rng.insertNode(mark);
     }
 
+    // restore
+    document.documentElement.scrollTop = pos;
+
     // clear the selection when done
-    window.getSelection().removeAllRanges();
+    window.getSelection().empty();
 }
 
 // initial load
 chrome.storage.local.get(window.location.href).then(highlights => {
-    applyHighlights(highlights[window.location.href]);
+    // delay applying by 1 sec - let document finish loading
+    setTimeout(() => applyHighlights(highlights[window.location.href]), 1000);
 });
