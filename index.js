@@ -53,11 +53,11 @@ function highlightCurrSelection() {
         });
     };
 
-    rng.deleteContents();
+    const extracted = rng.extractContents();
     rng.insertNode(mark);
     return () => {
         rng.deleteContents();
-        rng.insertNode(document.createTextNode(mark.innerText));
+        rng.insertNode(extracted);
     };
 }
 
