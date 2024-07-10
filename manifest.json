@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Highlighter",
+  "version": "0.1.0",
+  "description": "Minimalist and open source tool to highlight text on websites",
+  "content_scripts": [
+    {
+      "js": [
+        "index.js"
+      ],
+      "matches": [
+        "http://*/",
+        "https://*/"
+      ]
+    }
+  ]
+}
