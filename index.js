@@ -43,15 +43,22 @@ function highlightCurrSelection() {
 
     const mark = document.createElement("mark");
     mark.appendChild(rng.cloneContents());
-    const reset = () => {
-        rng.deleteContents();
-        rng.insertNode(document.createTextNode(mark.innerText));
-    }
-    mark.ondblclick = reset;
+    mark.ondblclick = () => {
+        // delete
+        chrome.storage.local.get(window.location.href).then(results => {
+            const highlights = results[window.location.href];
+            const filtered = highlights.filter(h => !h.includes(mark.innerText));
+            chrome.storage.local.set({[window.location.href]: filtered}).then(() => {
+            });
+        });
+    };
 
     rng.deleteContents();
     rng.insertNode(mark);
-    return reset;
+    return () => {
+        rng.deleteContents();
+        rng.insertNode(document.createTextNode(mark.innerText));
+    };
 }
 
 function recursiveHighlight(str) {
