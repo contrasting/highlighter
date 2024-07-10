@@ -3,6 +3,9 @@
   "name": "Highlighter",
   "version": "0.1.0",
   "description": "Minimalist and open source tool to highlight text on websites",
+  "permissions": [
+    "contextMenus"
+  ],
   "content_scripts": [
     {
       "js": [
@@ -13,5 +16,8 @@
         "https://*/"
       ]
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
 }
