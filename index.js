@@ -14,15 +14,11 @@ function applyHighlights(highlights, onlyFirst = false) {
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     for (let h of highlights) {
         // wraparound otherwise will skip instances
-        window.find(h, true, false, true);
-        let rng = window.getSelection().getRangeAt(0);
-
-        const mark = document.createElement("mark");
-        mark.appendChild(rng.cloneContents());
-
-        rng.deleteContents();
-        rng.insertNode(mark);
-
+        if (window.find(h, true, false, true)) {
+            highlightCurrSelection();
+        } else {
+            recursiveHighlight(h);
+        }
         if (onlyFirst) break;
     }
 
@@ -31,6 +27,30 @@ function applyHighlights(highlights, onlyFirst = false) {
 
     // clear the selection when done
     window.getSelection().empty();
+}
+
+function highlightCurrSelection() {
+    let rng = window.getSelection().getRangeAt(0);
+
+    const mark = document.createElement("mark");
+    mark.appendChild(rng.cloneContents());
+
+    rng.deleteContents();
+    rng.insertNode(mark);
+}
+
+function recursiveHighlight(str) {
+    const words = str.split(" ").filter(s => s !== "");
+
+    for (let i = words.length; i >= 0; i--) {
+        const reducedStr = words.filter((value, index) => index < i).join(" ");
+        if (window.find(reducedStr, true, false, true)) {
+            highlightCurrSelection();
+            // the rest of the string
+            recursiveHighlight(words.filter((value, index) => index >= i).join(" "));
+            break;
+        }
+    }
 }
 
 // initial load
