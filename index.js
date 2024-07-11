@@ -1,21 +1,12 @@
 // https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
 chrome.storage.local.onChanged.addListener((changes) => {
     const highlights = changes[window.location.href].newValue;
-    applyHighlights(highlights);
+    document.location.reload();
+    setTimeout(() => applyHighlights(highlights[window.location.href]), 1000);
 });
-
-
-const resets = [];
-
-function resetHighlights() {
-    resets.forEach(r => r());
-    resets.length = 0;
-}
 
 function applyHighlights(highlights) {
     if (highlights === undefined) return;
-
-    resetHighlights();
 
     // store the current scroll position
     const pos = document.documentElement.scrollTop;
@@ -25,7 +16,7 @@ function applyHighlights(highlights) {
     for (let h of highlights) {
         // wraparound otherwise will skip instances
         if (window.find(h, true, false, true)) {
-            resets.push(highlightCurrSelection());
+            highlightCurrSelection();
         } else {
             recursiveHighlight(h);
         }
@@ -52,13 +43,8 @@ function highlightCurrSelection() {
             });
         });
     };
-
-    const extracted = rng.extractContents();
+    rng.deleteContents();
     rng.insertNode(mark);
-    return () => {
-        rng.deleteContents();
-        rng.insertNode(extracted);
-    };
 }
 
 function recursiveHighlight(str) {
@@ -67,7 +53,7 @@ function recursiveHighlight(str) {
     for (let i = words.length; i >= 0; i--) {
         const reducedStr = words.filter((value, index) => index < i).join(" ");
         if (window.find(reducedStr, true, false, true)) {
-            resets.push(highlightCurrSelection());
+            highlightCurrSelection();
             // the rest of the string
             recursiveHighlight(words.filter((value, index) => index >= i).join(" "));
             break;
@@ -78,5 +64,5 @@ function recursiveHighlight(str) {
 // initial load
 chrome.storage.local.get(window.location.href).then(highlights => {
     // delay applying by 1 sec - let document finish loading
-    setTimeout(() => applyHighlights(highlights[window.location.href]), 1000);
+    setTimeout(() => applyHighlights(highlights[window.location.href]), 1500);
 });
