@@ -6,7 +6,8 @@
   "permissions": [
     "contextMenus",
     "storage",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "downloads"
   ],
   "content_scripts": [
     {
