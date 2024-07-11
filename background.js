@@ -17,7 +17,6 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.contextMenus.onClicked.addListener(async (item, tab) => {
     if (item.menuItemId === "highlighter_highlight") {
-
         const url = tab.url;
 
         // https://developer.chrome.com/docs/extensions/reference/api/storage#examples
