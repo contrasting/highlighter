@@ -47,8 +47,7 @@ function highlightCurrSelection() {
         chrome.storage.local.get(window.location.href).then(results => {
             const highlights = results[window.location.href];
             const filtered = highlights.filter(h => !h.includes(mark.innerText));
-            chrome.storage.local.set({[window.location.href]: filtered}).then(() => {
-            });
+            chrome.storage.local.set({[window.location.href]: filtered}).then();
         });
     };
     rng.deleteContents();

@@ -3,13 +3,13 @@
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
         id: "highlighter_highlight",
-        title: "Highlighter highlight",
+        title: "Highlight '%s'",
         type: 'normal',
         contexts: ['selection']
     });
     chrome.contextMenus.create({
         id: "highlighter_export",
-        title: "Highlighter export",
+        title: "Export",
         type: "normal",
         contexts: ["action"]
     });
