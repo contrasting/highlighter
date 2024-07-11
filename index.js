@@ -3,7 +3,7 @@ chrome.storage.local.onChanged.addListener((changes) => {
     const highlights = changes[window.location.href];
 
     // if is deletion, then refresh page
-    if (highlights.newValue.length < highlights.oldValue.length) {
+    if (highlights.oldValue != null && highlights.newValue.length < highlights.oldValue.length) {
         // reloading will automatically apply highlights
         document.location.reload();
     } else {
@@ -19,7 +19,6 @@ function applyHighlights(highlights, onlyFirst = false) {
     const pos = document.documentElement.scrollTop;
 
     // https://stackoverflow.com/questions/8276113/what-is-the-best-approach-to-search-some-text-in-body-html
-    // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     for (let h of highlights) {
         // wraparound otherwise will skip instances
         if (window.find(h, true, false, true)) {
@@ -40,6 +39,7 @@ function applyHighlights(highlights, onlyFirst = false) {
 function highlightCurrSelection() {
     let rng = window.getSelection().getRangeAt(0);
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     const mark = document.createElement("mark");
     mark.appendChild(rng.cloneContents());
     mark.ondblclick = () => {
