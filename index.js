@@ -22,7 +22,7 @@ function applyHighlights(highlights, onlyFirst = false) {
     for (let h of highlights) {
         // wraparound otherwise will skip instances
         if (window.find(h.text, true, false, true)) {
-            highlightCurrSelection(h.id);
+            highlightCurrSelection(h.id, h.type);
         } else {
             highlightMultiPara(h);
         }
@@ -36,11 +36,11 @@ function applyHighlights(highlights, onlyFirst = false) {
     window.getSelection().empty();
 }
 
-function highlightCurrSelection(id) {
+function highlightCurrSelection(id, type) {
     let rng = window.getSelection().getRangeAt(0);
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
-    const mark = document.createElement("mark");
+    const mark = document.createElement(type ?? "mark");
     mark.setAttribute("data-highlight", id)
     mark.appendChild(rng.cloneContents());
     mark.ondblclick = () => {
@@ -60,26 +60,35 @@ function highlightMultiPara(highlight) {
 
     for (let p of paragraphs) {
         if (window.find(p, true, false, true)) {
-            highlightCurrSelection(highlight.id);
+            highlightCurrSelection(highlight.id, highlight.type);
         }
     }
 }
 
 chrome.runtime.onMessage.addListener(async (message) => {
-    if (message === "highlight") {
-        const text = window.getSelection().toString();
-        const url = window.location.href;
+    const text = window.getSelection().toString();
+    const url = window.location.href;
 
-        // https://developer.chrome.com/docs/extensions/reference/api/storage#examples
-        const highlights = (await chrome.storage.local.get(url))[url] ?? [];
+    // https://developer.chrome.com/docs/extensions/reference/api/storage#examples
+    const highlights = (await chrome.storage.local.get(url))[url] ?? [];
 
-        await chrome.storage.local.set({
-            [url]: [{
-                text: text,
-                id: uuidv4(),
-            }, ...highlights]
-        })
+    let elementType;
+    switch (message) {
+        case "strikethrough":
+            elementType = "s";
+            break;
+        case "highlight":
+        default:
+            elementType = "mark";
     }
+
+    await chrome.storage.local.set({
+        [url]: [{
+            text: text,
+            id: uuidv4(),
+            type: elementType,
+        }, ...highlights]
+    })
 })
 
 // initial load
