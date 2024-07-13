@@ -24,7 +24,7 @@ function applyHighlights(highlights, onlyFirst = false) {
         if (window.find(h, true, false, true)) {
             highlightCurrSelection();
         } else {
-            recursiveHighlight(h);
+            highlightMultiPara(h);
         }
         if (onlyFirst) break;
     }
@@ -54,16 +54,12 @@ function highlightCurrSelection() {
     rng.insertNode(mark);
 }
 
-function recursiveHighlight(str) {
-    const words = str.split(" ").filter(s => s !== "");
+function highlightMultiPara(str) {
+    const paragraphs = str.split("\n").filter(s => s !== "");
 
-    for (let i = words.length; i >= 0; i--) {
-        const reducedStr = words.filter((value, index) => index < i).join(" ");
-        if (window.find(reducedStr, true, false, true)) {
+    for (let p of paragraphs) {
+        if (window.find(p, true, false, true)) {
             highlightCurrSelection();
-            // the rest of the string
-            recursiveHighlight(words.filter((value, index) => index >= i).join(" "));
-            break;
         }
     }
 }
