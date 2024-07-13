@@ -12,7 +12,8 @@
   "content_scripts": [
     {
       "js": [
-        "index.js"
+        "index.js",
+        "uuid.js"
       ],
       "matches": [
         "http://*/*",

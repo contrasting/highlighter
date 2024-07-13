@@ -21,8 +21,8 @@ function applyHighlights(highlights, onlyFirst = false) {
     // https://stackoverflow.com/questions/8276113/what-is-the-best-approach-to-search-some-text-in-body-html
     for (let h of highlights) {
         // wraparound otherwise will skip instances
-        if (window.find(h, true, false, true)) {
-            highlightCurrSelection();
+        if (window.find(h.text, true, false, true)) {
+            highlightCurrSelection(h.id);
         } else {
             highlightMultiPara(h);
         }
@@ -36,17 +36,18 @@ function applyHighlights(highlights, onlyFirst = false) {
     window.getSelection().empty();
 }
 
-function highlightCurrSelection() {
+function highlightCurrSelection(id) {
     let rng = window.getSelection().getRangeAt(0);
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     const mark = document.createElement("mark");
+    mark.setAttribute("data-highlight", id)
     mark.appendChild(rng.cloneContents());
     mark.ondblclick = () => {
         // delete
         chrome.storage.local.get(window.location.href).then(results => {
             const highlights = results[window.location.href];
-            const filtered = highlights.filter(h => !h.includes(mark.innerText));
+            const filtered = highlights.filter(h => h.id !== mark.getAttribute("data-highlight"));
             chrome.storage.local.set({[window.location.href]: filtered}).then();
         });
     };
@@ -54,12 +55,12 @@ function highlightCurrSelection() {
     rng.insertNode(mark);
 }
 
-function highlightMultiPara(str) {
-    const paragraphs = str.split("\n").filter(s => s !== "");
+function highlightMultiPara(highlight) {
+    const paragraphs = highlight.text.split("\n").filter(s => s !== "");
 
     for (let p of paragraphs) {
         if (window.find(p, true, false, true)) {
-            highlightCurrSelection();
+            highlightCurrSelection(highlight.id);
         }
     }
 }
@@ -73,7 +74,10 @@ chrome.runtime.onMessage.addListener(async (message) => {
         const highlights = (await chrome.storage.local.get(url))[url] ?? [];
 
         await chrome.storage.local.set({
-            [url]: [text, ...highlights]
+            [url]: [{
+                text: text,
+                id: uuidv4(),
+            }, ...highlights]
         })
     }
 })
