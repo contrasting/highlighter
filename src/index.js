@@ -1,18 +1,4 @@
-// https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
-chrome.storage.local.onChanged.addListener((changes) => {
-    const highlights = changes[window.location.href];
-
-    // if is deletion, then refresh page
-    if (highlights.oldValue != null && highlights.newValue.length < highlights.oldValue.length) {
-        // reloading will automatically apply highlights
-        document.location.reload();
-    } else {
-        applyHighlights(highlights.newValue, true);
-    }
-
-});
-
-function applyHighlights(highlights, onlyFirst = false) {
+function applyHighlights(highlights) {
     if (highlights === undefined) return;
 
     // store the current scroll position
@@ -26,7 +12,6 @@ function applyHighlights(highlights, onlyFirst = false) {
         } else {
             highlightMultiPara(h);
         }
-        if (onlyFirst) break;
     }
 
     // restore
@@ -48,7 +33,8 @@ function highlightCurrSelection(id, type) {
         chrome.storage.local.get(window.location.href).then(results => {
             const highlights = results[window.location.href];
             const filtered = highlights.filter(h => h.id !== mark.getAttribute("data-highlight"));
-            chrome.storage.local.set({[window.location.href]: filtered}).then();
+            // reloading will automatically apply highlights
+            chrome.storage.local.set({[window.location.href]: filtered}).then(window.location.reload);
         });
     };
     rng.deleteContents();
@@ -82,13 +68,15 @@ chrome.runtime.onMessage.addListener(async (message) => {
             elementType = "mark";
     }
 
-    await chrome.storage.local.set({
-        [url]: [{
-            text: text,
-            id: uuidv4(),
-            type: elementType,
-        }, ...highlights]
-    })
+    const newHighlight = {
+        text: text,
+        id: uuidv4(),
+        type: elementType,
+    };
+
+    await chrome.storage.local.set({[url]: [newHighlight, ...highlights]});
+
+    applyHighlights([newHighlight]);
 })
 
 // initial load
