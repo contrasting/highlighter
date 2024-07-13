@@ -30,11 +30,12 @@ function highlightCurrSelection(id, type) {
     mark.appendChild(rng.cloneContents());
     mark.ondblclick = () => {
         // delete
-        chrome.storage.local.get(window.location.href).then(results => {
+        chrome.storage.local.get(window.location.href).then(async results => {
             const highlights = results[window.location.href];
             const filtered = highlights.filter(h => h.id !== mark.getAttribute("data-highlight"));
+            await chrome.storage.local.set({[window.location.href]: filtered});
             // reloading will automatically apply highlights
-            chrome.storage.local.set({[window.location.href]: filtered}).then(window.location.reload);
+            window.location.reload();
         });
     };
     rng.deleteContents();
