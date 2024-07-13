@@ -1,14 +1,17 @@
 // https://developer.chrome.com/docs/extensions/develop/ui/context-menu
 
+const HIGHLIGHT = "highlighter_highlight";
+const EXPORT = "highlighter_export";
+
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
-        id: "highlighter_highlight",
+        id: HIGHLIGHT,
         title: "Highlight '%s'",
         type: 'normal',
         contexts: ['selection']
     });
     chrome.contextMenus.create({
-        id: "highlighter_export",
+        id: EXPORT,
         title: "Export",
         type: "normal",
         contexts: ["action"]
@@ -16,16 +19,9 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (item, tab) => {
-    if (item.menuItemId === "highlighter_highlight") {
-        const url = tab.url;
-
-        // https://developer.chrome.com/docs/extensions/reference/api/storage#examples
-        const highlights = (await chrome.storage.local.get(url))[url] ?? [];
-
-        await chrome.storage.local.set({
-            [url]: [item.selectionText, ...highlights]
-        })
-    } else if (item.menuItemId === "highlighter_export") {
+    if (item.menuItemId === HIGHLIGHT) {
+        await chrome.tabs.sendMessage(tab.id, "highlight");
+    } else if (item.menuItemId === EXPORT) {
         // https://stackoverflow.com/questions/23160600/chrome-extension-local-storage-how-to-export
         chrome.storage.local.get(null, function(items) { // null implies all items
             // Convert object to a string.

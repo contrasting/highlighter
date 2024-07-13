@@ -68,6 +68,20 @@ function recursiveHighlight(str) {
     }
 }
 
+chrome.runtime.onMessage.addListener(async (message) => {
+    if (message === "highlight") {
+        const text = window.getSelection().toString();
+        const url = window.location.href;
+
+        // https://developer.chrome.com/docs/extensions/reference/api/storage#examples
+        const highlights = (await chrome.storage.local.get(url))[url] ?? [];
+
+        await chrome.storage.local.set({
+            [url]: [text, ...highlights]
+        })
+    }
+})
+
 // initial load
 chrome.storage.local.get(window.location.href).then(highlights => {
     // delay applying by 1 sec - let document finish loading
