@@ -12,8 +12,8 @@
   "content_scripts": [
     {
       "js": [
-        "index.js",
-        "uuid.js"
+        "src/index.js",
+        "src/uuid.js"
       ],
       "matches": [
         "http://*/*",
@@ -22,6 +22,6 @@
     }
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background.js"
   }
 }
