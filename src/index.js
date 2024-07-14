@@ -26,13 +26,12 @@ function highlightCurrSelection(id, type) {
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     const mark = document.createElement(type ?? "mark");
-    mark.setAttribute("data-highlight", id)
     mark.appendChild(rng.cloneContents());
     mark.ondblclick = () => {
         // delete
         chrome.storage.local.get(window.location.href).then(async results => {
             const highlights = results[window.location.href];
-            const filtered = highlights.filter(h => h.id !== mark.getAttribute("data-highlight"));
+            const filtered = highlights.filter(h => h.id !== id);
             await chrome.storage.local.set({[window.location.href]: filtered});
             // reloading will automatically apply highlights
             window.location.reload();
