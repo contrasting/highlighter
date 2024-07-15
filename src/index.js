@@ -26,6 +26,7 @@ function highlightCurrSelection(id, type) {
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     const mark = document.createElement(type ?? "mark");
+    mark.style.cursor = "crosshair";
     mark.appendChild(rng.cloneContents());
     mark.ondblclick = () => {
         // delete
