@@ -8,7 +8,7 @@ function applyHighlights(highlights) {
     for (let h of highlights) {
         // wraparound otherwise will skip instances
         if (window.find(h.text, true, false, true)) {
-            highlightCurrSelection(h.id, h.type);
+            highlightCurrSelection(h.id, h.type, h.note);
         } else {
             highlightMultiPara(h);
         }
@@ -21,7 +21,7 @@ function applyHighlights(highlights) {
     window.getSelection().empty();
 }
 
-function highlightCurrSelection(id, type) {
+function highlightCurrSelection(id, type, note) {
     let rng = window.getSelection().getRangeAt(0);
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
@@ -44,6 +44,13 @@ function highlightCurrSelection(id, type) {
             window.location.reload();
         });
     };
+    if (note != null) {
+        const tooltip = createTooltip(note);
+        mark.style.borderBottom = "1px dotted black";
+        mark.onmouseenter = () => tooltip.style.visibility = "visible";
+        mark.onmouseleave = () => tooltip.style.visibility = "hidden";
+        mark.appendChild(tooltip);
+    }
     rng.deleteContents();
     rng.insertNode(mark);
 }
@@ -53,7 +60,7 @@ function highlightMultiPara(highlight) {
 
     for (let p of paragraphs) {
         if (window.find(p, true, false, true)) {
-            highlightCurrSelection(highlight.id, highlight.type);
+            highlightCurrSelection(highlight.id, highlight.type, highlight.note);
         }
     }
 }
@@ -71,6 +78,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
             elementType = "s";
             break;
         case "highlight":
+        case "annotate":
         default:
             elementType = "mark";
     }
@@ -79,12 +87,28 @@ chrome.runtime.onMessage.addListener(async (message) => {
         text: text,
         id: uuidv4(),
         type: elementType,
+        ... (message === "annotate" && {note: window.prompt("Enter note:")})
     };
 
     await chrome.storage.local.set({[url]: [newHighlight, ...highlights]});
 
     applyHighlights([newHighlight]);
 })
+
+function createTooltip(text) {
+    const tooltip = document.createElement("span");
+    tooltip.innerText = text;
+    // https://www.w3schools.com/css/css_tooltip.asp
+    tooltip.style.visibility = "hidden";
+    tooltip.style.maxWidth = "240px";
+    tooltip.style.backgroundColor = "black";
+    tooltip.style.color = "#fff";
+    tooltip.style.padding = "5px";
+    tooltip.style.borderRadius = "6px";
+    tooltip.style.position = "absolute";
+    tooltip.style.zIndex = "1";
+    return tooltip;
+}
 
 // initial load
 chrome.storage.local.get(window.location.href).then(highlights => {
