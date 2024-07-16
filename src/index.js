@@ -27,8 +27,14 @@ function highlightCurrSelection(id, type) {
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     const mark = document.createElement(type ?? "mark");
     mark.style.cursor = "crosshair";
+    // make focusable https://stackoverflow.com/questions/16261504/make-div-element-receive-focus
+    mark.tabIndex = 0;
+    mark.onfocus = () => mark.style.outlineStyle = "solid";
+    mark.onblur = () => mark.style.outlineStyle = "none";
     mark.appendChild(rng.cloneContents());
-    mark.ondblclick = () => {
+    // only fires when focused
+    mark.onkeydown = (ev) => {
+        if (ev.key !== "Delete") return;
         // delete
         chrome.storage.local.get(window.location.href).then(async results => {
             const highlights = results[window.location.href];
