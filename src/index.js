@@ -29,8 +29,8 @@ function highlightCurrSelection(id, type, note) {
     mark.style.cursor = "crosshair";
     // make focusable https://stackoverflow.com/questions/16261504/make-div-element-receive-focus
     mark.tabIndex = 0;
-    mark.onfocus = () => mark.style.outlineStyle = "solid";
-    mark.onblur = () => mark.style.outlineStyle = "none";
+    mark.onfocus = () => mark.style.outline = "solid 2px deepskyblue";
+    mark.onblur = () => mark.style.outline = "none";
     mark.appendChild(rng.cloneContents());
     // only fires when focused
     mark.onkeydown = (ev) => {
