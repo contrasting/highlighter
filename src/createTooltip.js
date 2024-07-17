@@ -1,0 +1,16 @@
+function createTooltip(text) {
+    const tooltip = document.createElement("span");
+    tooltip.innerText = text;
+    // https://www.w3schools.com/css/css_tooltip.asp
+    tooltip.style.visibility = "hidden";
+    tooltip.style.maxWidth = "240px";
+    tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    tooltip.style.backdropFilter = "blur(5px)";
+    tooltip.style.color = "#fff";
+    tooltip.style.padding = "6px 8px";
+    tooltip.style.borderRadius = "6px";
+    tooltip.style.position = "absolute";
+    tooltip.style.zIndex = "1";
+    tooltip.style.fontFamily = "sans-serif";
+    return tooltip;
+}
