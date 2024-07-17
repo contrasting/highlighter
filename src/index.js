@@ -5,13 +5,14 @@ function applyHighlights(highlights) {
     const pos = document.documentElement.scrollTop;
 
     for (let h of highlights) {
+        const tooltip = h.note != null ? createTooltip(h.note) : null;
         const paragraphs = h.text.split("\n").filter(s => s !== "");
 
         for (let p of paragraphs) {
             // https://stackoverflow.com/questions/8276113/what-is-the-best-approach-to-search-some-text-in-body-html
             // wraparound otherwise will skip instances
             if (window.find(p, true, false, true)) {
-                highlightCurrSelection(h.id, h.type, h.note);
+                highlightCurrSelection(h.id, h.type, tooltip);
             }
         }
     }
@@ -23,7 +24,7 @@ function applyHighlights(highlights) {
     window.getSelection().empty();
 }
 
-function highlightCurrSelection(id, type, note) {
+function highlightCurrSelection(id, type, tooltip) {
     let rng = window.getSelection().getRangeAt(0);
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
@@ -46,8 +47,7 @@ function highlightCurrSelection(id, type, note) {
             window.location.reload();
         });
     };
-    if (note != null) {
-        const tooltip = createTooltip(note);
+    if (tooltip != null) {
         mark.style.borderBottom = "1px dotted black";
         mark.onmouseenter = () => tooltip.style.visibility = "visible";
         mark.onmouseleave = () => tooltip.style.visibility = "hidden";
