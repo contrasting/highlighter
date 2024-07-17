@@ -37,15 +37,16 @@ function highlightCurrSelection(id, type, tooltip) {
     mark.appendChild(rng.cloneContents());
     // only fires when focused
     mark.onkeydown = (ev) => {
-        if (ev.key !== "Delete") return;
-        // delete
-        chrome.storage.local.get(window.location.href).then(async results => {
-            const highlights = results[window.location.href];
-            const filtered = highlights.filter(h => h.id !== id);
-            await chrome.storage.local.set({[window.location.href]: filtered});
-            // reloading will automatically apply highlights
-            window.location.reload();
-        });
+        if (ev.key === "Delete") {
+            // delete
+            chrome.storage.local.get(window.location.href).then(async results => {
+                const highlights = results[window.location.href];
+                const filtered = highlights.filter(h => h.id !== id);
+                await chrome.storage.local.set({[window.location.href]: filtered});
+                // reloading will automatically apply highlights
+                window.location.reload();
+            });
+        }
     };
     mark.ondblclick = () => {
         const note = window.prompt("Enter note:", tooltip?.innerText);
