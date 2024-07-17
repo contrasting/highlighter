@@ -47,6 +47,20 @@ function highlightCurrSelection(id, type, tooltip) {
             window.location.reload();
         });
     };
+    mark.ondblclick = () => {
+        const note = window.prompt("Enter note:", tooltip?.innerText);
+        if (note != null) {
+            // create or update note
+            chrome.storage.local.get(window.location.href).then(async results => {
+                const highlights = results[window.location.href];
+                const thisHighlight = highlights.find(h => h.id === id);
+                thisHighlight.note = note !== "" ? note : undefined;
+                const filtered = highlights.filter(h => h.id !== id);
+                await chrome.storage.local.set({[window.location.href]: [thisHighlight, ...filtered]});
+                window.location.reload();
+            });
+        }
+    }
     if (tooltip != null) {
         mark.style.borderBottom = "1px dotted black";
         mark.onmouseenter = () => tooltip.style.visibility = "visible";
@@ -70,7 +84,6 @@ chrome.runtime.onMessage.addListener(async (message) => {
             elementType = "s";
             break;
         case "highlight":
-        case "annotate":
         default:
             elementType = "mark";
     }
@@ -79,7 +92,6 @@ chrome.runtime.onMessage.addListener(async (message) => {
         text: text,
         id: uuidv4(),
         type: elementType,
-        ...(message === "annotate" && {note: window.prompt("Enter note:")})
     };
 
     await chrome.storage.local.set({[url]: [newHighlight, ...highlights]});

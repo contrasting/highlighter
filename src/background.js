@@ -3,7 +3,6 @@
 const HIGHLIGHT = "highlighter_highlight";
 const EXPORT = "highlighter_export";
 const STRIKETHROUGH = "highlighter_strikethrough";
-const ANNOTATE = "highlighter_annotate";
 
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
@@ -15,12 +14,6 @@ chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
         id: STRIKETHROUGH,
         title: "Strikethrough '%s'",
-        type: "normal",
-        contexts: ['selection']
-    });
-    chrome.contextMenus.create({
-        id: ANNOTATE,
-        title: "Annotate '%s'",
         type: "normal",
         contexts: ['selection']
     });
@@ -37,8 +30,6 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
         await chrome.tabs.sendMessage(tab.id, "highlight");
     } else if (item.menuItemId === STRIKETHROUGH) {
         await chrome.tabs.sendMessage(tab.id, "strikethrough");
-    } else if (item.menuItemId === ANNOTATE) {
-        await chrome.tabs.sendMessage(tab.id, "annotate");
     } else if (item.menuItemId === EXPORT) {
         // https://stackoverflow.com/questions/23160600/chrome-extension-local-storage-how-to-export
         chrome.storage.local.get(null, function(items) { // null implies all items
