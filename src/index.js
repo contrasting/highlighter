@@ -67,6 +67,7 @@ function highlightCurrSelection(id, type, tooltip) {
     }
     rng.deleteContents();
     rng.insertNode(mark);
+    // to get parent p, do this after inserting node, otherwise the ancestor will simply be a string
     changedNodes.push(rng.commonAncestorContainer);
 }
 
@@ -107,7 +108,7 @@ function reset() {
 // https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
 chrome.storage.local.onChanged.addListener((changes) => {
     reset();
-    applyHighlights(changes[window.location.href].newValue)
+    applyHighlights(changes[window.location.href].newValue);
 });
 
 // initial load
