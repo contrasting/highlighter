@@ -26,6 +26,10 @@ function applyHighlights(highlights) {
 
 function highlightCurrSelection(id, type, tooltip) {
     let rng = window.getSelection().getRangeAt(0);
+    // https://developer.mozilla.org/en-US/docs/Web/API/Range/commonAncestorContainer
+    let parent = rng.commonAncestorContainer;
+    while (parent.nodeType === Node.TEXT_NODE) parent = parent.parentNode;
+    addToChangedNodes({node: parent, old: parent.innerHTML});
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
     const mark = document.createElement(type ?? "mark");
@@ -67,8 +71,6 @@ function highlightCurrSelection(id, type, tooltip) {
     }
     rng.deleteContents();
     rng.insertNode(mark);
-    // to get parent p, do this after inserting node, otherwise the ancestor will simply be a string
-    changedNodes.push(rng.commonAncestorContainer);
 }
 
 chrome.runtime.onMessage.addListener(async (message) => {
@@ -99,9 +101,16 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 const changedNodes = [];
 
+function addToChangedNodes(node) {
+    // don't add if already added - it may have been modified
+    for (const n of changedNodes) {
+        if (n.node === node.node) return;
+    }
+    changedNodes.push(node);
+}
+
 function reset() {
-    // innerText is aware of styling and won't return the text of "hidden" elements. https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-    changedNodes.forEach(n => n.innerHTML = n.innerText);
+    changedNodes.forEach(n => n.node.innerHTML = n.old);
     changedNodes.length = 0;
 }
 
