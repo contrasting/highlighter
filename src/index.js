@@ -42,9 +42,7 @@ function highlightCurrSelection(id, type, tooltip) {
             chrome.storage.local.get(window.location.href).then(async results => {
                 const highlights = results[window.location.href];
                 const filtered = highlights.filter(h => h.id !== id);
-                await chrome.storage.local.set({[window.location.href]: filtered});
-                // reloading will automatically apply highlights
-                window.location.reload();
+                return chrome.storage.local.set({[window.location.href]: filtered});
             });
         }
     };
@@ -57,8 +55,7 @@ function highlightCurrSelection(id, type, tooltip) {
                 const thisHighlight = highlights.find(h => h.id === id);
                 thisHighlight.note = note !== "" ? note : undefined;
                 const filtered = highlights.filter(h => h.id !== id);
-                await chrome.storage.local.set({[window.location.href]: [thisHighlight, ...filtered]});
-                window.location.reload();
+                return chrome.storage.local.set({[window.location.href]: [thisHighlight, ...filtered]});
             });
         }
     }
@@ -70,6 +67,7 @@ function highlightCurrSelection(id, type, tooltip) {
     }
     rng.deleteContents();
     rng.insertNode(mark);
+    changedNodes.push(rng.commonAncestorContainer);
 }
 
 chrome.runtime.onMessage.addListener(async (message) => {
@@ -95,10 +93,22 @@ chrome.runtime.onMessage.addListener(async (message) => {
         type: elementType,
     };
 
-    await chrome.storage.local.set({[url]: [newHighlight, ...highlights]});
-
-    applyHighlights([newHighlight]);
+    return chrome.storage.local.set({[url]: [newHighlight, ...highlights]});
 })
+
+const changedNodes = [];
+
+function reset() {
+    // innerText is aware of styling and won't return the text of "hidden" elements. https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
+    changedNodes.forEach(n => n.innerHTML = n.innerText);
+    changedNodes.length = 0;
+}
+
+// https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
+chrome.storage.local.onChanged.addListener((changes) => {
+    reset();
+    applyHighlights(changes[window.location.href].newValue)
+});
 
 // initial load
 chrome.storage.local.get(window.location.href).then(highlights => {
