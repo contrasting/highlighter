@@ -1,8 +1,9 @@
 // https://developer.chrome.com/docs/extensions/develop/ui/context-menu
 
 const HIGHLIGHT = "highlighter_highlight";
-const EXPORT = "highlighter_export";
 const STRIKETHROUGH = "highlighter_strikethrough";
+const EXPORT = "highlighter_export";
+const IMPORT = "highlighter_import";
 
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
@@ -20,6 +21,12 @@ chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
         id: EXPORT,
         title: "Export",
+        type: "normal",
+        contexts: ["action"]
+    });
+    chrome.contextMenus.create({
+        id: IMPORT,
+        title: "Import",
         type: "normal",
         contexts: ["action"]
     });
@@ -43,5 +50,7 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
                 filename: 'highlighter_export.json'
             });
         });
+    } else if (item.menuItemId === IMPORT) {
+        await chrome.tabs.sendMessage(tab.id, "import");
     }
 });

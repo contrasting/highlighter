@@ -13,6 +13,7 @@
     {
       "js": [
         "src/createTooltip.js",
+        "src/import.js",
         "src/index.js",
         "src/uuid.js"
       ],

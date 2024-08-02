@@ -74,6 +74,10 @@ function highlightCurrSelection(id, type, tooltip) {
 }
 
 chrome.runtime.onMessage.addListener(async (message) => {
+    if (message === "import") {
+        return importHighlights();
+    }
+
     const text = window.getSelection().toString();
     const url = window.location.href;
 
