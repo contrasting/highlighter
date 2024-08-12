@@ -4,6 +4,7 @@ const HIGHLIGHT = "highlighter_highlight";
 const STRIKETHROUGH = "highlighter_strikethrough";
 const EXPORT = "highlighter_export";
 const IMPORT = "highlighter_import";
+const RELOAD = "highlighter_reload";
 
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
@@ -30,6 +31,12 @@ chrome.runtime.onInstalled.addListener(async () => {
         type: "normal",
         contexts: ["action"]
     });
+    chrome.contextMenus.create({
+        id: RELOAD,
+        title: "Reload highlights",
+        type: "normal",
+        contexts: ["page"]
+    });
 });
 
 chrome.contextMenus.onClicked.addListener(async (item, tab) => {
@@ -52,5 +59,7 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
         });
     } else if (item.menuItemId === IMPORT) {
         await chrome.tabs.sendMessage(tab.id, "import");
+    } else if (item.menuItemId === RELOAD) {
+        await chrome.tabs.sendMessage(tab.id, "reload");
     }
 });

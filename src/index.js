@@ -77,6 +77,12 @@ chrome.runtime.onMessage.addListener(async (message) => {
     if (message === "import") {
         return importHighlights();
     }
+    if (message === "reload") {
+        return chrome.storage.local.get(window.location.href).then(highlights => {
+            reset();
+            applyHighlights(highlights[window.location.href]);
+        });
+    }
 
     const text = window.getSelection().toString();
     const url = window.location.href;
