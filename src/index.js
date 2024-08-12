@@ -98,6 +98,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
         text: text,
         id: uuidv4(),
         type: elementType,
+        time: Date.now(),
     };
 
     return chrome.storage.local.set({[url]: [newHighlight, ...highlights]});
