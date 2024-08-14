@@ -64,7 +64,7 @@ function highlightCurrSelection(id, type, tooltip) {
         }
     }
     if (tooltip != null) {
-        mark.style.borderBottom = "1px dotted black";
+        mark.style.borderBottom = "2px dotted grey";
         mark.onmouseenter = () => tooltip.style.visibility = "visible";
         mark.onmouseleave = () => tooltip.style.visibility = "hidden";
         mark.appendChild(tooltip);
