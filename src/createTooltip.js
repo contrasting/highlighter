@@ -12,5 +12,7 @@ function createTooltip(text) {
     tooltip.style.position = "absolute";
     tooltip.style.zIndex = "1";
     tooltip.style.fontFamily = "sans-serif";
+    tooltip.style.fontSize = "16px";
+    tooltip.style.textAlign = "left";
     return tooltip;
 }
