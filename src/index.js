@@ -43,10 +43,10 @@ function highlightCurrSelection(id, type, tooltip) {
     mark.onkeydown = (ev) => {
         if (ev.key === "Delete") {
             // delete
-            chrome.storage.local.get(window.location.href).then(async results => {
-                const highlights = results[window.location.href];
+            chrome.storage.local.get(getPageKey()).then(async results => {
+                const highlights = results[getPageKey()];
                 const filtered = highlights.filter(h => h.id !== id);
-                return chrome.storage.local.set({[window.location.href]: filtered});
+                return chrome.storage.local.set({[getPageKey()]: filtered});
             });
         }
     };
@@ -54,12 +54,12 @@ function highlightCurrSelection(id, type, tooltip) {
         const note = window.prompt("Enter note:", tooltip?.innerText);
         if (note != null) {
             // create or update note
-            chrome.storage.local.get(window.location.href).then(async results => {
-                const highlights = results[window.location.href];
+            chrome.storage.local.get(getPageKey()).then(async results => {
+                const highlights = results[getPageKey()];
                 const thisHighlight = highlights.find(h => h.id === id);
                 thisHighlight.note = note !== "" ? note : undefined;
                 const filtered = highlights.filter(h => h.id !== id);
-                return chrome.storage.local.set({[window.location.href]: [thisHighlight, ...filtered]});
+                return chrome.storage.local.set({[getPageKey()]: [thisHighlight, ...filtered]});
             });
         }
     }
@@ -78,14 +78,14 @@ chrome.runtime.onMessage.addListener(async (message) => {
         return importHighlights();
     }
     if (message === "reload") {
-        return chrome.storage.local.get(window.location.href).then(highlights => {
+        return chrome.storage.local.get(getPageKey()).then(highlights => {
             reset();
-            applyHighlights(highlights[window.location.href]);
+            applyHighlights(highlights[getPageKey()]);
         });
     }
 
     const text = window.getSelection().toString();
-    const url = window.location.href;
+    const url = getPageKey();
 
     // https://developer.chrome.com/docs/extensions/reference/api/storage#examples
     const highlights = (await chrome.storage.local.get(url))[url] ?? [];
@@ -128,11 +128,11 @@ function reset() {
 // https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
 chrome.storage.local.onChanged.addListener((changes) => {
     reset();
-    applyHighlights(changes[window.location.href].newValue);
+    applyHighlights(changes[getPageKey()].newValue);
 });
 
 // initial load
-chrome.storage.local.get(window.location.href).then(highlights => {
+chrome.storage.local.get(getPageKey()).then(highlights => {
     // delay applying by 1 sec - let document finish loading
-    setTimeout(() => applyHighlights(highlights[window.location.href]), 1500);
+    setTimeout(() => applyHighlights(highlights[getPageKey()]), 1500);
 });
