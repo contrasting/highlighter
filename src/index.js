@@ -78,10 +78,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
         return importHighlights();
     }
     if (message === "reload") {
-        return chrome.storage.local.get(getPageKey()).then(highlights => {
-            reset();
-            applyHighlights(highlights[getPageKey()]);
-        });
+        return reloadHighlights();
     }
 
     const text = window.getSelection().toString();
@@ -125,6 +122,13 @@ function reset() {
     changedNodes.length = 0;
 }
 
+async function reloadHighlights() {
+    return chrome.storage.local.get(getPageKey()).then(highlights => {
+        reset();
+        applyHighlights(highlights[getPageKey()]);
+    });
+}
+
 // https://developer.chrome.com/docs/extensions/reference/api/storage#synchronous_response_to_storage_updates
 chrome.storage.local.onChanged.addListener((changes) => {
     reset();
@@ -136,3 +140,5 @@ chrome.storage.local.get(getPageKey()).then(highlights => {
     // delay applying by 1 sec - let document finish loading
     setTimeout(() => applyHighlights(highlights[getPageKey()]), 1500);
 });
+
+window.addEventListener("focus", reloadHighlights);
