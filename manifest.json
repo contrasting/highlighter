@@ -14,9 +14,9 @@
       "js": [
         "src/createTooltip.js",
         "src/import.js",
-        "src/index.js",
         "src/uuid.js",
-        "src/pageKey.js"
+        "src/pageKey.js",
+        "src/index.js"
       ],
       "matches": [
         "http://*/*",
