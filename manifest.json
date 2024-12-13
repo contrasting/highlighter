@@ -26,5 +26,8 @@
   ],
   "background": {
     "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_icon": "highlighter.png"
   }
 }
