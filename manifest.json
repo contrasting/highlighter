@@ -7,7 +7,9 @@
     "contextMenus",
     "storage",
     "unlimitedStorage",
-    "downloads"
+    "downloads",
+    "sidePanel",
+    "tabs"
   ],
   "content_scripts": [
     {
@@ -29,5 +31,8 @@
   },
   "action": {
     "default_icon": "highlighter.png"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel.html"
   }
 }

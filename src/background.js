@@ -63,3 +63,8 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
         await chrome.tabs.sendMessage(tab.id, "reload");
     }
 });
+
+// Allows users to open the side panel by clicking on the action toolbar icon
+chrome.sidePanel
+    .setPanelBehavior({ openPanelOnActionClick: true })
+    .catch((error) => console.error(error));
