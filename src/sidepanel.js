@@ -26,7 +26,8 @@ function setActiveUrl(url) {
         const highlightsDiv = document.querySelector("#highlights");
         highlightsDiv.innerHTML = "";
         if (highlights[pageKey] == null || highlights[pageKey].length === 0) {
-            highlightsDiv.innerHTML = "There are no highlights on this page."
+            highlightsDiv.innerHTML = "There are no highlights on this page.";
+            return;
         }
         for (const h of highlights[pageKey]) {
             const p = document.createElement("p");
