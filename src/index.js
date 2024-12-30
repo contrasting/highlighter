@@ -5,14 +5,13 @@ function applyHighlights(highlights) {
     const pos = document.documentElement.scrollTop;
 
     for (let h of highlights) {
-        const tooltip = h.note != null ? createTooltip(h.note) : null;
         const paragraphs = h.text.split("\n").filter(s => s !== "");
 
         for (let p of paragraphs) {
             // https://stackoverflow.com/questions/8276113/what-is-the-best-approach-to-search-some-text-in-body-html
             // wraparound otherwise will skip instances
             if (window.find(p, true, false, true)) {
-                highlightCurrSelection(h.id, h.type, tooltip);
+                highlightCurrSelection(h.id, h.type, h.note);
             }
         }
     }
@@ -24,7 +23,7 @@ function applyHighlights(highlights) {
     window.getSelection().empty();
 }
 
-function highlightCurrSelection(id, type, tooltip) {
+function highlightCurrSelection(id, type, note) {
     let rng = window.getSelection().getRangeAt(0);
     // https://developer.mozilla.org/en-US/docs/Web/API/Range/commonAncestorContainer
     let parent = rng.commonAncestorContainer;
@@ -51,23 +50,25 @@ function highlightCurrSelection(id, type, tooltip) {
         }
     };
     mark.ondblclick = () => {
-        const note = window.prompt("Enter note:", tooltip?.innerText);
-        if (note != null) {
+        const newNote = window.prompt("Enter note:", note);
+        if (newNote != null) {
             // create or update note
             chrome.storage.local.get(getPageKey()).then(async results => {
                 const highlights = results[getPageKey()];
                 const thisHighlight = highlights.find(h => h.id === id);
-                thisHighlight.note = note !== "" ? note : undefined;
+                thisHighlight.note = newNote !== "" ? newNote : undefined;
                 const filtered = highlights.filter(h => h.id !== id);
                 return chrome.storage.local.set({[getPageKey()]: [thisHighlight, ...filtered]});
             });
         }
     }
-    if (tooltip != null) {
+    if (note != null) {
         mark.style.borderBottom = "2px dotted grey";
-        mark.onmouseenter = () => tooltip.style.visibility = "visible";
+        mark.onmouseenter = () => {
+            tooltip.style.visibility = "visible";
+            tooltip.innerText = note;
+        };
         mark.onmouseleave = () => tooltip.style.visibility = "hidden";
-        mark.appendChild(tooltip);
     }
     rng.deleteContents();
     rng.insertNode(mark);
@@ -142,3 +143,12 @@ chrome.storage.local.get(getPageKey()).then(highlights => {
 });
 
 window.addEventListener("focus", reloadHighlights);
+
+// create global tooltip element
+const tooltip = createTooltip("");
+document.body.appendChild(tooltip);
+document.addEventListener("mousemove", (event) => {
+    // https://stackoverflow.com/a/62347962/10176917
+    tooltip.style.left = event.pageX + 'px';
+    tooltip.style.top = event.pageY + 'px';
+});

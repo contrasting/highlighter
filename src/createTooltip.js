@@ -1,5 +1,6 @@
 function createTooltip(text) {
     const tooltip = document.createElement("span");
+    tooltip.id = "highlighter-tooltip";
     tooltip.innerText = text;
     // https://www.w3schools.com/css/css_tooltip.asp
     tooltip.style.visibility = "hidden";
