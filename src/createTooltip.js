@@ -3,7 +3,7 @@ function createTooltip(text) {
     tooltip.id = "highlighter-tooltip";
     tooltip.innerText = text;
     // https://www.w3schools.com/css/css_tooltip.asp
-    tooltip.style.visibility = "hidden";
+    tooltip.style.visibility = "visible";
     tooltip.style.maxWidth = "240px";
     tooltip.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
     tooltip.style.backdropFilter = "blur(5px)";

@@ -65,15 +65,11 @@ function highlightCurrSelection(id, type, note) {
     if (note != null) {
         mark.style.borderBottom = "2px dotted grey";
         mark.onmouseenter = () => {
-            isHovering = true;
-            tooltip.style.visibility = "visible";
+            document.body.appendChild(tooltip);
             tooltip.innerText = note;
         };
         mark.onmouseleave = () => {
-            isHovering = false;
-            tooltip.style.visibility = "hidden";
-            tooltip.style.left = '0px';
-            tooltip.style.top = '0px';
+            document.body.removeChild(tooltip);
         };
     }
     rng.deleteContents();
@@ -152,11 +148,8 @@ window.addEventListener("focus", reloadHighlights);
 
 // create global tooltip element
 const tooltip = createTooltip("");
-document.body.appendChild(tooltip);
 document.addEventListener("mousemove", (event) => {
-    if (!isHovering) return;
     // https://stackoverflow.com/a/62347962/10176917
     tooltip.style.left = event.pageX + 'px';
     tooltip.style.top = event.pageY + 'px';
 });
-let isHovering = false;
