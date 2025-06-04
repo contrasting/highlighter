@@ -55,6 +55,10 @@ chrome.contextMenus.onClicked.addListener(async (item, tab) => {
             chrome.downloads.download({
                 url: url,
                 filename: 'highlighter_export.json'
+            }).then(() => {
+                // set new backup time
+                console.log("setting new backup time");
+                chrome.storage.sync.set({"lastBackup": new Date().getTime()});
             });
         });
     } else if (item.menuItemId === IMPORT) {

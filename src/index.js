@@ -153,3 +153,5 @@ document.addEventListener("mousemove", (event) => {
     tooltip.style.left = event.pageX + 'px';
     tooltip.style.top = event.pageY + 'px';
 });
+
+checkBackup();

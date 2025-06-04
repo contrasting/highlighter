@@ -18,6 +18,7 @@
         "src/import.js",
         "src/uuid.js",
         "src/pageKey.js",
+        "src/checkBackup.js",
         "src/index.js"
       ],
       "matches": [
