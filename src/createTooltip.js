@@ -11,7 +11,7 @@ function createTooltip(text) {
     tooltip.style.padding = "6px 8px";
     tooltip.style.borderRadius = "6px";
     tooltip.style.position = "absolute";
-    tooltip.style.zIndex = "1";
+    tooltip.style.zIndex = "50";
     tooltip.style.fontFamily = "sans-serif";
     tooltip.style.fontSize = "16px";
     tooltip.style.textAlign = "left";
